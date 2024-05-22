@@ -1,7 +1,7 @@
 // Uncomment this block to pass the first stage
 use std::{
     io::{Read, Write},
-    net::TcpListener,
+    net::{TcpListener, TcpStream},
 };
 
 fn main() {
@@ -17,14 +17,22 @@ fn main() {
             Ok(mut stream) => {
                 println!("accepted new connection");
 
-                let mut buff = [0; 52];
-                stream.read(&mut buff).unwrap();
-
-                stream.write(b"+PONG\r\n").unwrap();
+                handle_stream(&mut stream);
             }
             Err(e) => {
                 println!("error: {}", e);
             }
         }
+    }
+}
+
+fn handle_stream(stream: &mut TcpStream) {
+    let mut buff = [0; 1024];
+    loop {
+        let bytes_read = stream.read(&mut buff).unwrap();
+        if bytes_read == 0 {
+            return;
+        }
+        stream.write(b"+PONG\r\n").unwrap();
     }
 }
