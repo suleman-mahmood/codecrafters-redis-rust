@@ -10,10 +10,10 @@ async fn main() {
     loop {
         let stream = listener.accept().await;
         match stream {
-            Ok((mut stream, _)) => {
+            Ok((stream, _)) => {
                 println!("accepted new connection");
 
-                tokio::spawn(handle_stream(&mut stream));
+                tokio::spawn(handle_stream(stream));
             }
             Err(e) => {
                 println!("error: {}", e);
@@ -22,7 +22,7 @@ async fn main() {
     }
 }
 
-async fn handle_stream(stream: &mut TcpStream) {
+async fn handle_stream(mut stream: TcpStream) {
     let mut buff = [0; 1024];
     loop {
         let bytes_read = stream.read(&mut buff).await.unwrap();
